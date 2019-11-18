@@ -23,27 +23,27 @@ aws.config.update({
 
 withHermes(hermes => {
   const dialog = hermes.dialog()
-  dialog.flow('PatientIntent', (msg, flow) => {
+  dialog.flow('kaboe003:PatientIntent', (msg, flow) => {
     piz = msg.slots[0].value.value;
     console.log(msg))
     flow.end()
     return "Guten Tag Patient" + msg.slots[0].value.value
   })
-  dialog.flow('ZSTIntent', (msg, flow) => {
+  dialog.flow('kaboe003:ZSTIntent', (msg, flow) => {
     zst = msg.slot[0].value.value;
     info.set('Zahnstein', zst);
     console.log(msg))
     flow.end()
     return "Verstanden"
   })
-  dialog.flow('MUIntent', (msg, flow) => {
+  dialog.flow('kaboe003:MUIntent', (msg, flow) => {
     mu = msg.slot[0].value.value;
     info.set("Mundkrankheit", mu);
     console.log(msg))
     flow.end()
     return "Verstanden"
   })
-  dialog.flow('ZahnIntent', (msg, flow) => {
+  dialog.flow('kaboe003:ZahnIntent', (msg, flow) => {
     if (zaehne.size() <= 32){
     zaehne.set('${msg.slots[0].value.value}${msg.slots[1].value.value, msg.slots[2].value.value}')
     console.log(msg))
@@ -53,7 +53,7 @@ withHermes(hermes => {
   flow.end()
   return "Es sind bereits alle 32 Zähne erfasst."
   })
-  dialog.flow('StopIntent', (msg, flow) => {
+  dialog.flow('kaboe003:StopIntent', (msg, flow) => {
     console.log(msg))
     docClient.put(params)
     flow.end()
