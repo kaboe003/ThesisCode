@@ -1,9 +1,26 @@
 const { withHermes } = require('hermes-javascript')
+const aws = require("aws-sdk");
+var dynamoDB = new aws.DynamoDB();
+var docClient = new AWS.DynamoDB.DocumentClient();
 var zst;
 var mu;
 var zaehne = new Map();
 var info = new Map();
 var piz;
+var params = {
+  TableName:TeethCounter,
+  Item:{
+    "piz" = piz.toString(),
+    "zaehne" = zaehne,
+    "info" = info
+  }
+}
+
+aws.config.update({
+  region: "eu-central-1"
+  endpoint: "http://localhost:60"
+});
+
 withHermes(hermes => {
   const dialog = hermes.dialog()
   dialog.flow('PatientIntent', (msg, flow) => {
@@ -36,5 +53,11 @@ withHermes(hermes => {
   flow.end()
   return "Es sind bereits alle 32 Zähne erfasst."
   })
+  dialog.flow('StopIntent', (msg, flow) => {
+    console.log(msg))
+    docClient.put(params)
+    flow.end()
+    return "Patient" + piz +"gespeichert"
+  })
 
-})
+});
