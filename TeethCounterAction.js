@@ -1,63 +1,105 @@
-const { withHermes } = require('hermes-javascript')
+const { withHermes } = require('hermes-javascript');
+const fs = require('fs');
 const aws = require("aws-sdk");
 var dynamoDB = new aws.DynamoDB();
-var docClient = new AWS.DynamoDB.DocumentClient();
+var docClient = new aws.DynamoDB.DocumentClient();
 var zst;
 var mu;
-var zaehne = new Map();
-var info = new Map();
+var zstatus;
 var piz;
-var params = {
-  TableName:TeethCounter,
-  Item:{
-    "piz" = piz.toString(),
-    "zaehne" = zaehne,
-    "info" = info
-  }
+var params= {}
+
+
+/*aws.config.update({
+  region: 'eu-central-1',
+  endpoint: 'http://localhost:8000'
+});*/
+
+
+
+withHermes((hermes, done) => {
+  const dialog = hermes.dialog()
+
+  //dialog.flows(intents);
+  dialog.flow('kaboe003:PatientIntent', (msg, flow) => {
+    console.log('PatientIntent');
+    createObject();
+    piz = msg.slots[0].value.value;
+    params.Item.id = piz;
+
+    flow.continue('kaboe003:ZSTIntent', (msg, flow) => {
+      console.log('ZSTIntent');
+      zst = msg.slots[0].value.value
+      params.Item.info.push({'Zahnstein': zst});
+      flow.continue('kaboe003:MUIntent', (msg, flow) => {
+        console.log('MUIntent');
+        mu = msg.slots[0].value.value
+        params.Item.info.push({'Mundkrankheit': mu});
+        flow.continue('kaboe003:ZahnIntent', (msg, flow) => {
+          var quadrant = msg.slots[0].value.value;
+          var zahn = msg.slots[1].value.value;
+          var zstatus = msg.slots[2].value.value;
+          var zaehne = quadrant.toString() + zahn.toString();
+          console.log(zaehne);
+          params.Item.zaehne.push({[zaehne]:zstatus});
+          console.log('ZahnIntent' + ' ' );
+          cont();
+        })
+      })
+
+    })
+    function cont(){
+      flow.continue('kaboe003:ZahnIntent', (msg, flow) => {
+        if (msg.slots[0].value.value == 'Stop'){
+        console.log('Stop');
+        //testmap.set("info", info);
+        //testmap.set("zaehne", zaehne);
+        docClient.put(params, function(err, data) {
+          if (err) console.log(err);
+          else console.log(data);
+        });
+
+        console.log(params);
+
+        flow.end();
+      } else {
+      console.log('ZahnIntent fortgesetzt' + ' ' );
+      var quadrant = msg.slots[0].value.value;
+      var zahn = msg.slots[1].value.value;
+      var zstatus = msg.slots[2].value.value;
+      var zaehne = quadrant.toString() + zahn.toString();
+      params.Item.zaehne.push({[zaehne]:zstatus});
+      
+      cont();
+    }
+
+      })
+    }
+
+  })
+
+
+});
+function setZahn(quadrant, zahn, wert){
+  zaehne.set(`${quadrant}${zahn}`, wert);
+  console.log(zaehne);
 }
 
-aws.config.update({
-  region: "eu-central-1"
-  endpoint: "http://localhost:60"
-});
+function createItem(piz, zstWert, muWert, quadrant, zahn, zahnWert){
+  //Item.
+}
 
-withHermes(hermes => {
-  const dialog = hermes.dialog()
-  dialog.flow('kaboe003:PatientIntent', (msg, flow) => {
-    piz = msg.slots[0].value.value;
-    console.log(msg))
-    flow.end()
-    return "Guten Tag Patient" + msg.slots[0].value.value
-  })
-  dialog.flow('kaboe003:ZSTIntent', (msg, flow) => {
-    zst = msg.slot[0].value.value;
-    info.set('Zahnstein', zst);
-    console.log(msg))
-    flow.end()
-    return "Verstanden"
-  })
-  dialog.flow('kaboe003:MUIntent', (msg, flow) => {
-    mu = msg.slot[0].value.value;
-    info.set("Mundkrankheit", mu);
-    console.log(msg))
-    flow.end()
-    return "Verstanden"
-  })
-  dialog.flow('kaboe003:ZahnIntent', (msg, flow) => {
-    if (zaehne.size() <= 32){
-    zaehne.set('${msg.slots[0].value.value}${msg.slots[1].value.value, msg.slots[2].value.value}')
-    console.log(msg))
-    flow.end()
-    return "Verstanden"
-  }
-  flow.end()
-  return "Es sind bereits alle 32 Zähne erfasst."
-  })
-  dialog.flow('kaboe003:StopIntent', (msg, flow) => {
-    console.log(msg))
-    docClient.put(params)
-    flow.end()
-    return "Patient" + piz +"gespeichert"
-  })
+function createObject(){
+  params.TableName = "TeethCounter";
+  params.Item ={};
+  params.Item.zaehne = [];
+  params.Item.info = [];
+  console.log(params);
+}
 
-});
+
+
+
+
+
+//});
