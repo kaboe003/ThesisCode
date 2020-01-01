@@ -80,6 +80,7 @@ withHermes((hermes, done) => {
 
 dialog.flow('kaboe003:PatientIntent', (msg, flow) => {
   console.log("Test");
+  return "test";
 })
 
 });
