@@ -1,6 +1,6 @@
 const { withHermes } = require('hermes-javascript');
-const fs = require('fs');
 const aws = require("aws-sdk");
+
 var dynamoDB = new aws.DynamoDB();
 var docClient = new aws.DynamoDB.DocumentClient();
 var zst;
@@ -10,10 +10,10 @@ var piz;
 var params= {}
 
 
-/*aws.config.update({
+aws.config.update({
   region: 'eu-central-1',
   endpoint: 'http://localhost:8000'
-});*/
+});
 
 
 
@@ -21,7 +21,7 @@ withHermes((hermes, done) => {
   const dialog = hermes.dialog()
 
   //dialog.flows(intents);
-  dialog.flow('kaboe003:PatientIntent', (msg, flow) => {
+/*  dialog.flow('kaboe003:PatientIntent', (msg, flow) => {
     console.log('PatientIntent');
     createObject();
     piz = msg.slots[0].value.value;
@@ -69,15 +69,18 @@ withHermes((hermes, done) => {
       var zstatus = msg.slots[2].value.value;
       var zaehne = quadrant.toString() + zahn.toString();
       params.Item.zaehne.push({[zaehne]:zstatus});
-      
+
       cont();
     }
 
       })
     }
 
-  })
+  })*/
 
+dialog.flow('kaboe003:PatientIntent', (msg, flow) => {
+  console.log("Test");
+})
 
 });
 function setZahn(quadrant, zahn, wert){
