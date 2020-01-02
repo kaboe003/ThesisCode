@@ -97,10 +97,3 @@ function createObject(){
   params.Item.info = [];
   console.log(params);
 }
-
-
-
-
-
-
-//});
