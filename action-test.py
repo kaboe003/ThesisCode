@@ -30,12 +30,11 @@ def subscribe_intent_callback(hermes, intentMessage):
 
 
 def action_wrapper(hermes, intentMessage, conf):
-    {{#each action_code as |a|}}{{a}}
-    {{/each}}
+   print("Parsed intent : {}".format(intent_message.intent.intent_name))
 
 
 if __name__ == "__main__":
     mqtt_opts = MqttOptions()
     with Hermes(mqtt_options=mqtt_opts) as h:
-        h.subscribe_intent("{{intent_id}}", subscribe_intent_callback) \
+        h.subscribe_intent("PatientIntent", subscribe_intent_callback) \
          .start()
