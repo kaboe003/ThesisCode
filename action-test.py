@@ -24,17 +24,42 @@ def read_configuration_file(configuration_file):
     except (IOError, configparser.Error) as e:
         return dict()
 
-def subscribe_intent_callback(hermes, intentMessage):
+def patient_intent_callback(hermes, intentMessage):
     conf = read_configuration_file(CONFIG_INI)
     action_wrapper(hermes, intentMessage, conf)
 
 
-def action_wrapper(hermes, intentMessage, conf):
-   print("Parsed intent : {}".format(intent_message.intent.intent_name))
+def patient_wrapper(hermes, intentMessage, conf):
+    print('Patient')
 
+def zst_intent_callback(hermes, intentMessage):
+    conf = read_configuration_file(CONFIG_INI)
+    zst_wrapper(hermes, intentMessage, conf)
+
+
+def zst_wrapper(hermes, intentMessage, conf):
+    print('zst')
+    
+def mu_intent_callback(hermes, intentMessage):
+        conf = read_configuration_file(CONFIG_INI)
+        mu_wrapper(hermes, intentMessage, conf)
+
+
+def mu_wrapper(hermes, intentMessage, conf):
+        print('mu')
+        
+        
+def zahn_intent_callback(hermes, intentMessage):
+    conf = read_configuration_file(CONFIG_INI)
+    zahn_wrapper(hermes, intentMessage, conf)
+
+
+def zahn_wrapper(hermes, intentMessage, conf):
+    print('zahn')
+    
 
 if __name__ == "__main__":
     mqtt_opts = MqttOptions()
     with Hermes(mqtt_options=mqtt_opts) as h:
-        h.subscribe_intent("PatientIntent", subscribe_intent_callback) \
+        h.subscribe_intent("kaboe003:PatientIntent", subscribe_intent_callback) \
          .start()
