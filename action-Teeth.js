@@ -18,9 +18,9 @@ aws.config.update({
 
 
 withHermes((hermes, done) => {
-  const dialog = hermes.dialog()
+  const dialog = hermes.dialog();
 
-  dialog.flows(intents);
+
   dialog.flow('kaboe003:PatientIntent', (msg, flow) => {
     console.log('PatientIntent');
     createObject();
