@@ -46,7 +46,7 @@ def zahn_intent_callback(hermes, intentMessage):
 def stop_intent_callback(hermes, intentMessage):
     conf = read_configuration_file(CONFIG_INI)
     stop_wrapper(hermes, intentMessage, conf)
-    data['piz'] = intentMessage.slots.slot1
+    #data['piz'] = intentMessage.slots.slot1
     
 def patient_wrapper(hermes, intentMessage, conf):
     print('Patient')hermes.publish_continue_session(intentMessage.session_id, "Herzlich Willkommen Patient 1", intents)
@@ -54,7 +54,7 @@ def patient_wrapper(hermes, intentMessage, conf):
 def mu_wrapper(hermes, intentMessage, conf):
     print('mu')
     hermes.publish_continue_session(intentMessage.session_id, "Bitte weiter", intents)
-    info['mu'] = intentMessage.slots.slot1
+    #info['mu'] = intentMessage.slots.slot1
 
 def zst_wrapper(hermes, intentMessage, conf):
     print('zst')
@@ -64,7 +64,7 @@ def zst_wrapper(hermes, intentMessage, conf):
 def zahn_wrapper(hermes, intentMessage, conf):
     print('zahn')
     hermes.publish_continue_session(intentMessage.session_id, "Bitte weiter", intents)
-    zaehne[str(intentMessage.slots.slot1) + str(intentMessage.slots.slot2)] = intentMessage.slots.slot3
+    #zaehne[str(intentMessage.slots.slot1) + str(intentMessage.slots.slot2)] = intentMessage.slots.slot3
 
 def stop_wrapper(hermes, intentMessage, conf):
     print('Stop')
