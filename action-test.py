@@ -49,7 +49,8 @@ def stop_intent_callback(hermes, intentMessage):
     #data['piz'] = intentMessage.slots.slot1
     
 def patient_wrapper(hermes, intentMessage, conf):
-    print('Patient')hermes.publish_continue_session(intentMessage.session_id, "Herzlich Willkommen Patient 1", intents)
+    print('Patient')
+    hermes.publish_continue_session(intentMessage.session_id, "Herzlich Willkommen Patient 1", intents)
 
 def mu_wrapper(hermes, intentMessage, conf):
     print('mu')
