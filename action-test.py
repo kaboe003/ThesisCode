@@ -51,7 +51,7 @@ def stop_intent_callback(hermes, intentMessage):
 def patient_wrapper(hermes, intentMessage, conf):
     print('Patient')
     hermes.publish_continue_session(intentMessage.session_id, "Herzlich Willkommen Patient 1", intents)
-    hermes.publish_end_session(intentMessage.session_id, "Patient Beendet")
+    
 
 def mu_wrapper(hermes, intentMessage, conf):
     print('mu')
@@ -70,6 +70,7 @@ def zahn_wrapper(hermes, intentMessage, conf):
 
 def stop_wrapper(hermes, intentMessage, conf):
     print('Stop')
+    hremes.publish_end_session(intentMessage.session_id, "Vielen Dank")
    
     
     
@@ -80,9 +81,10 @@ def stop_wrapper(hermes, intentMessage, conf):
 if __name__ == "__main__":
     mqtt_opts = MqttOptions()
     with Hermes(mqtt_options=mqtt_opts) as h:
-        h.subscribe_intent("kaboe003:PatientIntent", patient_intent_callback) \
-        .subscribe_intent("kaboe003:ZSTIntent", zst_intent_callback)\
-        .subscribe_intent("kaboe003:MUIntent", mu_intent_callback)\
-        .subscribe_intent("kaboe003:ZahnIntent", zahn_intent_callback)\
-        .subscribe_intent("kaboe003:Stop", stop_intent_callback)\
-         .start()
+    h.publish_start_session_action(None, "Herzlich Willkommen", intents, true)
+    h.subscribe_intent("kaboe003:PatientIntent", patient_intent_callback) \
+    .subscribe_intent("kaboe003:ZSTIntent", zst_intent_callback)\
+    .subscribe_intent("kaboe003:MUIntent", mu_intent_callback)\
+    .subscribe_intent("kaboe003:ZahnIntent", zahn_intent_callback)\
+    .subscribe_intent("kaboe003:Stop", stop_intent_callback)\
+    .start()
