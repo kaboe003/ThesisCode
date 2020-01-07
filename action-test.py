@@ -1,90 +1,97 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-import configparser
+#import configparser
 import boto3
 from hermes_python.hermes import Hermes
 from hermes_python.ffi.utils import MqttOptions
 from hermes_python.ontology import *
+import dynamo
 
 
-#CONFIGURATION_ENCODING_FORMAT = "utf-8"
-#CONFIG_INI = "config.ini"
-intents =["kaboe003:PatientIntent", "kaboe003:ZSTIntent", "kaboe003:MUIntent", "kaboe003:ZahnIntent", "kaboe003:Stop"]
+intents = ["kaboe003:PatientIntent", "kaboe003:ZSTIntent", "kaboe003:MUIntent", "kaboe003:ZahnIntent"]
 
 
-class SnipsConfigParser(configparser.SafeConfigParser):
-    def to_dict(self):
-        return {section : {option_name : option for option_name, option in self.items(section)} for section in self.sections()}
-
-
-"""def read_configuration_file(configuration_file):
-    try:
-        with io.open(configuration_file, encoding=CONFIGURATION_ENCODING_FORMAT) as f:
-            conf_parser = SnipsConfigParser()
-            conf_parser.readfp(f)
-            return conf_parser.to_dict()
-    except (IOError, configparser.Error) as e:
-        return dict()
-"""
 def patient_intent_callback(hermes, intentMessage):
-    conf = read_configuration_file(CONFIG_INI)
-    patient_wrapper(hermes, intentMessage, conf)
+    #conf = read_configuration_file(CONFIG_INI)
+    patient_wrapper(hermes, intentMessage)
+
 
 def zst_intent_callback(hermes, intentMessage):
-    conf = read_configuration_file(CONFIG_INI)
-    zst_wrapper(hermes, intentMessage, conf)
+    #conf = read_configuration_file(CONFIG_INI)
+    zst_wrapper(hermes, intentMessage)
+
 
 def mu_intent_callback(hermes, intentMessage):
-    conf = read_configuration_file(CONFIG_INI)
-    mu_wrapper(hermes, intentMessage, conf)
+    #conf = read_configuration_file(CONFIG_INI)
+    mu_wrapper(hermes, intentMessage)
+
 
 def zahn_intent_callback(hermes, intentMessage):
-    conf = read_configuration_file(CONFIG_INI)
-    zahn_wrapper(hermes, intentMessage, conf)
+    #conf = read_configuration_file(CONFIG_INI)
+    zahn_wrapper(hermes, intentMessage)
+
 
 def stop_intent_callback(hermes, intentMessage):
-    conf = read_configuration_file(CONFIG_INI)
-    stop_wrapper(hermes, intentMessage, conf)
-    #data['piz'] = intentMessage.slots.slot1
+    #conf = read_configuration_file(CONFIG_INI)
+    stop_wrapper(hermes, intentMessage)
+    # data['piz'] = intentMessage.slots.slot1
     
-def patient_wrapper(hermes, intentMessage, conf):
+def session_started(hermes, session_started_message):
+    print("Session started")
+    
+   
+
+    
+def patient_wrapper(hermes, intentMessage):
+    print(intentMessage.session_id)
     print('Patient')
-    hermes.publish_continue_session(intentMessage.session_id, "Herzlich Willkommen Patient 1", intents)
+    piz = int(intentMessage.slots.id.first().value)
+    hermes.publish_continue_session(intentMessage.session_id, "Herzlich Willkommen zu Ihrer Untersuchung Patient {}".format(piz)  , intents)
+    dynamo.set_value("data", "piz", piz)
+    
     
 
-def mu_wrapper(hermes, intentMessage, conf):
+
+def mu_wrapper(hermes, intentMessage):
     print('mu')
-    hermes.publish_continue_session(intentMessage.session_id, "Bitte weiter", intents)
-    #info['mu'] = intentMessage.slots.slot1
+    value = intentMessage.slots.MUStatus.first().value
+    hermes.publish_continue_session(intentMessage.session_id, "Verstanden", intents)
+    dynamo.set_value("info", "mu", value)
 
-def zst_wrapper(hermes, intentMessage, conf):
+
+def zst_wrapper(hermes, intentMessage):
     print('zst')
-    hermes.publish_continue_session(intentMessage.session_id, "Bitte weiter", intents)
-    #info['zst'] = intentMessage.slots.slot1
+    value = intentMessage.slots.ZSTStatus.first().value
+    hermes.publish_continue_session(intentMessage.session_id, "Verstanden", intents)
+    dynamo.set_value("info", "zst", value)
 
-def zahn_wrapper(hermes, intentMessage, conf):
+
+def zahn_wrapper(hermes, intentMessage):
     print('zahn')
-    hermes.publish_continue_session(intentMessage.session_id, "Bitte weiter", intents)
-    #zaehne[str(intentMessage.slots.slot1) + str(intentMessage.slots.slot2)] = intentMessage.slots.slot3
+    quadrant = int(intentMessage.slots.quadrant.first().value)
+    zahn = int(intentMessage.slots.zahl.first().value)
+    value = intentMessage.slots.status.first().value
+    hermes.publish_continue_session(intentMessage.session_id, "Verstanden", intents)
+    dynamo.set_value("zaehne", str(quadrant) + str(zahn), value)
+    dynamo.printAll()
 
-def stop_wrapper(hermes, intentMessage, conf):
+
+def stop_wrapper(hermes, intentMessage):
     print('Stop')
     hremes.publish_end_session(intentMessage.session_id, "Vielen Dank")
-   
-    
-    
-    
-    
-    
+    dynamo.printAll()
 
 if __name__ == "__main__":
     mqtt_opts = MqttOptions()
     with Hermes(mqtt_options=mqtt_opts) as h:
-    h.publish_start_session_action(None, "Herzlich Willkommen", intents, true)
-    h.subscribe_intent("kaboe003:PatientIntent", patient_intent_callback) \
-    .subscribe_intent("kaboe003:ZSTIntent", zst_intent_callback)\
-    .subscribe_intent("kaboe003:MUIntent", mu_intent_callback)\
-    .subscribe_intent("kaboe003:ZahnIntent", zahn_intent_callback)\
-    .subscribe_intent("kaboe003:Stop", stop_intent_callback)\
-    .start()
+        h.subscribe_intent("kaboe003:PatientIntent", patient_intent_callback) \
+        .subscribe_intent("kaboe003:ZSTIntent", zst_intent_callback) \
+        .subscribe_intent("kaboe003:MUIntent", mu_intent_callback) \
+        .subscribe_intent("kaboe003:ZahnIntent", zahn_intent_callback) \
+        .subscribe_intent("kaboe003:Stop", stop_intent_callback)\
+        .subscribe_session_started(session_started)\
+        .loop_forever()
+       
+        
+            
