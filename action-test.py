@@ -39,6 +39,7 @@ def stop_intent_callback(hermes, intentMessage):
     
 def session_started(hermes, session_started_message):
     print("Session started")
+    #dynamo.new_table()
     
    
 
@@ -68,19 +69,24 @@ def zst_wrapper(hermes, intentMessage):
 
 
 def zahn_wrapper(hermes, intentMessage):
-    print('zahn')
-    quadrant = int(intentMessage.slots.quadrant.first().value)
-    zahn = int(intentMessage.slots.zahl.first().value)
-    value = intentMessage.slots.status.first().value
-    hermes.publish_continue_session(intentMessage.session_id, "Verstanden", intents)
-    dynamo.set_value("zaehne", str(quadrant) + str(zahn), value)
-    dynamo.printAll()
+    try:
+        print('zahn')
+        quadrant = int(intentMessage.slots.quadrant.first().value)
+        zahn = int(intentMessage.slots.zahl.first().value)
+        value = intentMessage.slots.status.first().value
+        hermes.publish_continue_session(intentMessage.session_id, "Verstanden", intents)
+        dynamo.set_value("zaehne", str(quadrant) + str(zahn), value)
+        
+    except (AttributeError):
+        print("Bitte erneut eingeben")
+        hermes.publish_continue_session(intentMessage.session_id, "Bitte erneut eingeben", intents)
+    
 
 
 def stop_wrapper(hermes, intentMessage):
     print('Stop')
     hremes.publish_end_session(intentMessage.session_id, "Vielen Dank")
-    dynamo.printAll()
+   # dynamo new_entry()
 
 if __name__ == "__main__":
     mqtt_opts = MqttOptions()

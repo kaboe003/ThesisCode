@@ -9,7 +9,7 @@ dynamodb_client = boto3.client('dynamodb')
 data = dict()
 info = dict()
 zaehne = dict()
-def new_table(self):
+def new_table():
     try:
         table = dynamodb.create_table(
 
@@ -33,13 +33,14 @@ def new_table(self):
         )
         print("Table status:", table.table_status)
     except dynamodb_client.exceptions.ResourceInUseException:
-        print("Exception")
+        print("Tabelle bereits erzeugt")
             
 def new_entry(self):
     table = dynamodb.Table('Patient')
     Item= data
     Item['info'] = info
     Item['zaehne'] = zaehne
+    print(item)
     table.put_item(Item)
       
 def set_value(dict, key, value):
@@ -53,9 +54,6 @@ def set_value(dict, key, value):
         zaehne[key] = value
         print(zaehne)
         
-def printAll():
-    data["info"] =info
-    data["zaehne"] =zaehne
-    print(data)
+
 
 
