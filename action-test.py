@@ -50,19 +50,20 @@ def mu_wrapper(hermes, intentMessage):
         dynamo.set_value("info", "mu", "Ja")
 
 def zahn_intent_callback(hermes, intentMessage):
-    zahn_wrapper(hermes, intentMessage)
-    hermes.publish_continue_session(intentMessage.session_id, "Verstanden", intents)
-    
-def zahn_wrapper(hermes, intentMessage):
     try:
-        if len(dynamo.zaehne) <= 32:
-            print('zahn')
-            quadrant = int(intentMessage.slots.quadrant.first().value)
-            zahn = int(intentMessage.slots.zahl.first().value)
-            value = intentMessage.slots.status.first().value
-            dynamo.set_value("zaehne", str(quadrant) + str(zahn), value)
+        zahn_wrapper(hermes, intentMessage)
+        hermes.publish_continue_session(intentMessage.session_id, "Verstanden", intents)
     except (AttributeError):
-        print("Bitte erneut eingeben")
+        print("AttributeError")
+        hermes.publish_continue_session(intentMessage.session_id, "Bitte Erneut eingeben", intents)
+def zahn_wrapper(hermes, intentMessage):
+    if len(dynamo.zaehne) <= 32:
+        print('zahn')
+        quadrant = int(intentMessage.slots.quadrant.first().value)
+        zahn = int(intentMessage.slots.zahl.first().value)
+        value = intentMessage.slots.status.first().value
+        dynamo.set_value("zaehne", str(quadrant) + str(zahn), value)
+   
        
 
 def stop_intent_callback(hermes, intentMessage):
