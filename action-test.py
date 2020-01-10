@@ -14,7 +14,7 @@ intents = ["kaboe003:PatientIntent", "kaboe003:ZSTIntent", "kaboe003:MUIntent", 
 
 def patient_intent_callback(hermes, intentMessage):
     patient_wrapper(hermes, intentMessage)
-    hermes.publish_continue_session( intentMessage.session_id, "Herzlich Willkommen zu Ihrer Untersuchung Patient {}".format(piz),intents)
+    hermes.publish_continue_session( intentMessage.session_id, "Herzlich Willkommen zu Ihrer Untersuchung",intents)
     
 def patient_wrapper(hermes, intentMessage):
     print('Patient')
@@ -88,25 +88,16 @@ def stop_wrapper(hermes, intentMessage):
 
 def session_started(hermes, session_started_message):
     print("Session started")
+    dynamo.newTable()
     hermes.publish_start_session_action(None, "Herzlich Willkommen zu Ihrer Untersuchung", intents, True, False, None)
     
 def session_ended(hermes, session_ended_message):
     print("Session ended")
     
-
-
-
-
-
-
-
-
-    
-
 def stop_wrapper(hermes, intentMessage):
     print('Stop')
-    hremes.publish_end_session(intentMessage.session_id, "Vielen Dank")
-   # dynamo new_entry()
+    hermes.publish_end_session(intentMessage.session_id, "Vielen Dank")
+    dynamo.new_entry()
 
 if __name__ == "__main__":
     mqtt_opts = MqttOptions()
